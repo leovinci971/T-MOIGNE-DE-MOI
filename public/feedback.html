@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Votre avis — Témoigne de moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin/>
+  <link rel="stylesheet" href="/theme.css"/>
+  <script src="/app.js" defer></script>
+  <style>
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 50% -5%,rgba(244,185,66,.15) 0%,transparent 55%);}
+    .wrap{position:relative;z-index:1;align-items:center;}
+    .success-anim{font-size:56px;display:block;text-align:center;animation:popIn .5s cubic-bezier(.34,1.56,.64,1);margin-bottom:12px;}
+    @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+    .type-badge{display:inline-flex;align-items:center;gap:7px;padding:5px 16px;border-radius:30px;background:rgba(232,130,90,.1);border:1px solid rgba(232,130,90,.2);font-size:.78rem;color:var(--warm1);}
+    .stars-wrap{display:flex;justify-content:center;gap:10px;margin:4px 0;}
+    .star{font-size:36px;cursor:pointer;transition:transform .15s;filter:grayscale(1) opacity(.3);user-select:none;-webkit-user-select:none;}
+    .star.active{filter:none;}
+    .star:hover{transform:scale(1.15);}
+    .star-label{text-align:center;font-size:.82rem;color:var(--muted);min-height:20px;}
+    .sat-options{display:flex;flex-direction:column;gap:7px;}
+    .sat-opt{display:flex;align-items:center;gap:11px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;transition:all .18s;background:var(--bg);font-size:.9rem;}
+    .sat-opt:hover{border-color:var(--warm1);background:rgba(232,130,90,.04);}
+    .sat-opt.selected{border-color:var(--warm1);background:rgba(232,130,90,.08);font-weight:600;}
+    .sat-emoji{font-size:20px;}
+    .thankyou{text-align:center;padding:20px 0;display:none;animation:fadeIn .4s ease;}
+    .thankyou.show{display:block;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .btn-home{display:inline-block;padding:12px 28px;background:var(--warm1);border-radius:10px;color:#fff;text-decoration:none;font-weight:600;transition:opacity .2s;margin-top:10px;}
+    .btn-home:hover{opacity:.88;}
+    .rgpd-note{font-size:.72rem;color:var(--muted);text-align:center;margin-top:8px;line-height:1.6;}
+    .rgpd-note a{color:var(--warm1);text-decoration:none;}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/" class="topbar-logo">
+    <div class="topbar-icon" id="topbarIcon">
+      <svg viewBox="0 0 24 24" fill="white" width="16" height="16"><rect x="10" y="2" width="4" height="20" rx="1"/><rect x="2" y="8" width="20" height="4" rx="1"/></svg>
+    </div>
+    <span id="topbarTitle">Témoigne de moi</span>
+  </a>
+</div>
+
+<div class="wrap">
+  <span class="success-anim">🎉</span>
+  <div class="page-header" style="padding:0 0 4px;">
+    <h1>Merci pour votre témoignage !</h1>
+    <p>Prenez 30 secondes pour nous donner votre avis.</p>
+  </div>
+  <div class="type-badge" id="typeBadge">💬 Témoignage reçu</div>
+
+  <div id="feedbackForm" style="width:100%;display:flex;flex-direction:column;gap:16px;">
+    <div class="card">
+      <div class="card-title">⭐ Votre note</div>
+      <div class="stars-wrap">
+        <span class="star" data-v="1" onclick="setNote(1)">⭐</span>
+        <span class="star" data-v="2" onclick="setNote(2)">⭐</span>
+        <span class="star" data-v="3" onclick="setNote(3)">⭐</span>
+        <span class="star" data-v="4" onclick="setNote(4)">⭐</span>
+        <span class="star" data-v="5" onclick="setNote(5)">⭐</span>
+      </div>
+      <div class="star-label" id="starLabel">Cliquez pour noter</div>
+    </div>
+    <div class="card">
+      <div class="card-title">😊 Satisfaction</div>
+      <div class="sat-options">
+        <div class="sat-opt" onclick="setSat(this,'tres_satisfait')"><span class="sat-emoji">😊</span> Très satisfait(e)</div>
+        <div class="sat-opt" onclick="setSat(this,'satisfait')"><span class="sat-emoji">🙂</span> Satisfait(e)</div>
+        <div class="sat-opt" onclick="setSat(this,'neutre')"><span class="sat-emoji">😐</span> Neutre</div>
+        <div class="sat-opt" onclick="setSat(this,'insatisfait')"><span class="sat-emoji">😕</span> Insatisfait(e)</div>
+        <div class="sat-opt" onclick="setSat(this,'tres_insatisfait')"><span class="sat-emoji">😞</span> Très insatisfait(e)</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">💡 Piste d'amélioration <span style="font-weight:400;font-style:italic;text-transform:none;letter-spacing:0;">(optionnel)</span></div>
+      <div class="field" style="margin:0;">
+        <textarea id="amelioration" placeholder="Qu'est-ce qui pourrait être amélioré ?" style="min-height:90px;"></textarea>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="btnFeedback" onclick="sendFeedback()">Envoyer mon avis →</button>
+    <div style="text-align:center;">
+      <a onclick="skip()" style="font-size:.78rem;color:var(--muted);cursor:pointer;text-decoration:underline;">Passer cette étape</a>
+    </div>
+  </div>
+
+  <div class="thankyou" id="thankyou">
+    <div style="font-size:48px;margin-bottom:12px;">🙏</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:10px;">Merci infiniment !</h2>
+    <p style="color:var(--muted);margin-bottom:16px;">Votre avis nous aide à nous améliorer.</p>
+    <p class="rgpd-note">
+      Pour exercer vos droits RGPD (accès, suppression) : <span id="feedbackContact">—</span><br>
+      <a href="/confidentialite">Politique de confidentialité</a>
+    </p>
+    <a href="/" class="btn-home" style="margin-top:16px;">← Retour à l'accueil</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+const params  = new URLSearchParams(window.location.search);
+const cType   = params.get('type')   || sessionStorage.getItem('tdm_type')   || 'ecrit';
+const cAuthor = params.get('author') || sessionStorage.getItem('tdm_author') || 'Anonyme';
+
+const badges = { audio:'🎙 Témoignage vocal', video:'🎥 Témoignage vidéo', ecrit:'✍️ Témoignage écrit' };
+document.getElementById('typeBadge').textContent = badges[cType] || '💬 Témoignage';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const cfg = await tdmLoadConfig();
+  if (cfg.contactEmail) {
+    document.getElementById('feedbackContact').innerHTML =
+      `<a href="mailto:${cfg.contactEmail}" style="color:var(--warm1);">${cfg.contactEmail}</a>`;
+  }
+});
+
+let note = 0, sat = '';
+const labels = ['','Insuffisant','Passable','Bien','Très bien','Excellent !'];
+
+function setNote(n) {
+  note = n;
+  document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('active', i < n));
+  document.getElementById('starLabel').textContent = labels[n];
+}
+
+document.querySelectorAll('.star').forEach(s => {
+  s.addEventListener('mouseenter', () => {
+    const v = parseInt(s.dataset.v);
+    document.querySelectorAll('.star').forEach((st, i) => st.classList.toggle('active', i < v));
+  });
+  s.addEventListener('mouseleave', () => {
+    document.querySelectorAll('.star').forEach((st, i) => st.classList.toggle('active', i < note));
+  });
+});
+
+function setSat(el, val) {
+  document.querySelectorAll('.sat-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected'); sat = val;
+}
+
+async function sendFeedback() {
+  if (!note) { toast('Veuillez donner une note.', 'err'); return; }
+  if (!sat)  { toast('Veuillez choisir votre satisfaction.', 'err'); return; }
+  const btn = document.getElementById('btnFeedback');
+  btn.disabled = true; btn.innerHTML = '<span class="spin">↻</span> Envoi…';
+  try {
+    const res  = await fetch('/api/send/feedback', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sender: cAuthor, type: cType, note, satisfaction: sat,
+        amelioration: document.getElementById('amelioration').value.trim(),
+      }),
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+    showThankyou();
+  } catch(e) {
+    btn.disabled = false; btn.innerHTML = 'Envoyer mon avis →';
+    toast('Erreur : ' + e.message, 'err');
+  }
+}
+
+function skip() { showThankyou(); }
+
+function showThankyou() {
+  document.getElementById('feedbackForm').style.display = 'none';
+  document.getElementById('thankyou').classList.add('show');
+  sessionStorage.removeItem('tdm_type');
+  sessionStorage.removeItem('tdm_author');
+}
+</script>
+</body>
+</html>
