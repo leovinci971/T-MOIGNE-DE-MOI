@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Témoignage vocal — Témoigne de moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin/>
+  <link rel="stylesheet" href="/theme.css"/>
+  <script src="/app.js" defer></script>
+  <style>
+    .wave-box{width:100%;height:60px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;position:relative;overflow:hidden;}
+    #waveCanvas{position:absolute;inset:0;width:100%;height:100%;}
+    .wave-idle{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:4px;}
+    .wb{width:3px;border-radius:2px;background:var(--border);animation:wbF 2.2s ease-in-out infinite;}
+    @keyframes wbF{0%,100%{transform:scaleY(1)}50%{transform:scaleY(2.5)}}
+    .timer{font-family:'Playfair Display',serif;font-size:3rem;font-weight:700;text-align:center;color:var(--text);transition:color .3s;font-variant-numeric:tabular-nums;}
+    .timer.rec{color:var(--warm1);}
+    .size-hint{text-align:center;font-size:.68rem;color:var(--muted);letter-spacing:.08em;min-height:18px;margin-top:2px;transition:color .3s;}
+    .size-hint.warn{color:var(--warm1);}
+    .rec-area{display:flex;flex-direction:column;align-items:center;gap:10px;}
+    .btn-rec{width:78px;height:78px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(145deg,var(--warm1),#c4613a);box-shadow:0 0 0 6px rgba(232,130,90,.12),0 8px 24px rgba(232,130,90,.4);display:flex;align-items:center;justify-content:center;transition:all .22s cubic-bezier(.34,1.56,.64,1);}
+    .btn-rec:active{transform:scale(.92);}
+    .btn-rec.recording{background:var(--bg);border:2px solid var(--warm1);animation:recPulse 1.6s ease-in-out infinite;}
+    @keyframes recPulse{0%,100%{box-shadow:0 0 0 6px rgba(232,130,90,.08),0 0 40px rgba(232,130,90,.2)}50%{box-shadow:0 0 0 14px rgba(232,130,90,.03),0 0 60px rgba(232,130,90,.28)}}
+    .rec-dot{width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2);transition:all .25s cubic-bezier(.34,1.56,.64,1);}
+    .btn-rec.recording .rec-dot{border-radius:5px;width:22px;height:22px;background:var(--warm1);}
+    .rec-status{font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);}
+    .rec-status.active{color:var(--warm1);}
+    .rec-list{display:flex;flex-direction:column;gap:8px;}
+    .rec-item{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;display:flex;align-items:center;gap:10px;animation:itemIn .28s ease;}
+    @keyframes itemIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .rdot{width:8px;height:8px;border-radius:50%;background:var(--warm1);box-shadow:0 0 8px rgba(232,130,90,.5);flex-shrink:0;transition:background .3s;}
+    .rdot.sent{background:var(--green);box-shadow:0 0 8px rgba(107,174,142,.4);}
+    .rec-info{flex:1;min-width:0;}
+    .rec-name{font-size:.75rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .rec-meta{font-size:.62rem;color:var(--muted);margin-top:2px;}
+    .rec-btns{display:flex;gap:4px;}
+    .ib{width:30px;height:30px;border-radius:7px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .16s;text-decoration:none;flex-shrink:0;}
+    .ib:hover{border-color:var(--warm1);color:var(--warm1);}
+    .ib.g:hover{border-color:var(--green);color:var(--green);}
+    .ib.r:hover{border-color:#d44;color:#d44;}
+    .ib.sb{animation:spin .7s linear infinite;border-color:var(--warm1);color:var(--warm1);pointer-events:none;}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/" class="topbar-logo">
+    <div class="topbar-icon" id="topbarIcon">
+      <svg viewBox="0 0 24 24" fill="white" width="16" height="16"><rect x="10" y="2" width="4" height="20" rx="1"/><rect x="2" y="8" width="20" height="4" rx="1"/></svg>
+    </div>
+    <span id="topbarTitle">Témoigne de moi</span>
+  </a>
+</div>
+
+<div class="wrap">
+  <a href="/" class="back">← Choisir un autre mode</a>
+  <div class="page-header">
+    <div class="page-icon" style="background:rgba(232,130,90,.12);">🎙</div>
+    <h1>Témoignage vocal</h1>
+    <p>Enregistrez votre message à la voix</p>
+  </div>
+  <div class="card">
+    <div class="field">
+      <input type="text" id="prenomInput" placeholder="Prénom (facultatif)" maxlength="40" autocomplete="given-name"/>
+    </div>
+    <div class="field">
+      <input type="text" id="nomInput" placeholder="Nom (facultatif)" maxlength="40" autocomplete="family-name"/>
+    </div>
+    <div class="field-anon">
+      <span class="anon-icon">👤</span> Laisser vide = témoignage anonyme
+    </div>
+    <div class="wave-box" style="margin-bottom:14px;">
+      <canvas id="waveCanvas"></canvas>
+      <div class="wave-idle" id="waveIdle">
+        <div class="wb" style="height:6px;animation-delay:.0s"></div><div class="wb" style="height:16px;animation-delay:.18s"></div>
+        <div class="wb" style="height:9px;animation-delay:.36s"></div><div class="wb" style="height:24px;animation-delay:.08s"></div>
+        <div class="wb" style="height:12px;animation-delay:.44s"></div><div class="wb" style="height:20px;animation-delay:.26s"></div>
+        <div class="wb" style="height:7px;animation-delay:.52s"></div><div class="wb" style="height:26px;animation-delay:.14s"></div>
+        <div class="wb" style="height:11px;animation-delay:.40s"></div><div class="wb" style="height:18px;animation-delay:.30s"></div>
+        <div class="wb" style="height:8px;animation-delay:.56s"></div><div class="wb" style="height:22px;animation-delay:.22s"></div>
+      </div>
+    </div>
+    <div class="timer" id="timer">00:00</div>
+    <div class="size-hint" id="sizeHint"></div>
+    <div class="rec-area" style="margin-top:16px;">
+      <button class="btn-rec" id="btnRec" onclick="toggleRec()">
+        <div class="rec-dot"></div>
+      </button>
+      <div class="rec-status" id="recStatus">Appuyer pour enregistrer</div>
+    </div>
+  </div>
+  <div class="card" id="listCard" style="display:none;">
+    <div class="card-title">Enregistrements</div>
+    <div class="rec-list" id="recList"></div>
+    <button class="btn btn-primary" style="margin-top:12px;" id="btnSendAll" onclick="sendAll()">↗ Envoyer tout</button>
+  </div>
+</div>
+
+<a href="/feedback?type=audio" class="feedback-fab" onclick="sessionStorage.setItem('tdm_type','audio')">
+  <span class="fi">⭐</span> Je donne mon avis
+</a>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+let recs=[],mr=null,chunks=[],sec=0,tInt=null,recOn=false,actx=null,analyser=null,raf=null,stream=null;
+let chunksTotalSize=0;
+let PREFIX='vocal', SEUIL_MB=10;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const cfg = await tdmLoadConfig();
+  PREFIX   = cfg.audioPrefix  || 'vocal';
+  SEUIL_MB = cfg.audioSizeMb  || 10;
+});
+
+window.addEventListener('pagehide', () => {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  cancelAnimationFrame(raf);
+  actx?.close();
+});
+
+async function toggleRec() { recOn ? stopRec() : await startRec(); }
+
+async function startRec() {
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch { toast('Microphone inaccessible.', 'err'); return; }
+
+  actx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = actx.createAnalyser(); analyser.fftSize = 512;
+  actx.createMediaStreamSource(stream).connect(analyser);
+  document.getElementById('waveIdle').style.display = 'none';
+  drawWave();
+
+  const mime = ['audio/webm;codecs=opus','audio/webm','audio/ogg','audio/mp4'].find(t => MediaRecorder.isTypeSupported(t)) || '';
+  mr = new MediaRecorder(stream, mime ? { mimeType: mime } : {});
+  chunks = []; chunksTotalSize = 0;
+  mr.ondataavailable = e => { if (e.data.size > 0) { chunks.push(e.data); chunksTotalSize += e.data.size; updateSizeHint(); } };
+  mr.onstop = finalize;
+  mr.start(1000); // chunk toutes les 1s pour suivi taille
+
+  recOn = true; sec = 0;
+  document.getElementById('timer').textContent = '00:00';
+  document.getElementById('btnRec').classList.add('recording');
+  document.getElementById('recStatus').textContent = 'Enregistrement en cours…';
+  document.getElementById('recStatus').classList.add('active');
+  document.getElementById('timer').classList.add('rec');
+  tInt = setInterval(() => { sec++; document.getElementById('timer').textContent = tdmFormatDuration(sec); }, 1000);
+}
+
+function updateSizeHint() {
+  const mb = (chunksTotalSize / 1024 / 1024).toFixed(1);
+  const el = document.getElementById('sizeHint');
+  el.textContent = `Taille estimée : ${mb} MB / seuil ${SEUIL_MB} MB`;
+  el.classList.toggle('warn', parseFloat(mb) >= SEUIL_MB * 0.8);
+}
+
+function stopRec() {
+  mr?.stop(); stream?.getTracks().forEach(t => t.stop());
+  clearInterval(tInt); cancelAnimationFrame(raf); actx?.close(); actx = null;
+  document.getElementById('waveIdle').style.display = 'flex';
+  document.getElementById('sizeHint').textContent = '';
+  recOn = false;
+  document.getElementById('btnRec').classList.remove('recording');
+  document.getElementById('recStatus').textContent = 'Appuyer pour enregistrer';
+  document.getElementById('recStatus').classList.remove('active');
+  document.getElementById('timer').classList.remove('rec');
+}
+
+function finalize() {
+  const blob = new Blob(chunks, { type: chunks[0]?.type || 'audio/webm' });
+  const ext  = blob.type.includes('ogg') ? '.ogg' : blob.type.includes('mp4') ? '.m4a' : '.webm';
+  const now  = new Date();
+  const name = `${PREFIX}_${tdmFormatDate(now)}_${tdmFormatTime(now)}${ext}`;
+  recs.push({ blob, url: URL.createObjectURL(blob), name, date: now, dur: sec, sent: false });
+  render();
+  toast(`Enregistré : ${name}`, 'inf');
+}
+
+function drawWave() {
+  const cv = document.getElementById('waveCanvas');
+  const cx = cv.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = cv.offsetWidth * dpr; cv.height = cv.offsetHeight * dpr; cx.scale(dpr, dpr);
+  const W = cv.offsetWidth, H = cv.offsetHeight;
+  const buf = new Uint8Array(analyser.frequencyBinCount);
+  (function loop() {
+    raf = requestAnimationFrame(loop);
+    analyser.getByteTimeDomainData(buf);
+    cx.clearRect(0, 0, W, H);
+    const g = cx.createLinearGradient(0, 0, W, 0);
+    g.addColorStop(0, 'rgba(232,130,90,.2)'); g.addColorStop(.5, '#E8825A'); g.addColorStop(1, 'rgba(244,185,66,.4)');
+    cx.strokeStyle = g; cx.lineWidth = 2; cx.shadowBlur = 10; cx.shadowColor = '#E8825A';
+    cx.beginPath();
+    buf.forEach((v, i) => { const y = (v / 128) * H / 2; i === 0 ? cx.moveTo(0, y) : cx.lineTo(i * (W / buf.length), y); });
+    cx.lineTo(W, H / 2); cx.stroke();
+  })();
+}
+
+function render() {
+  const card = document.getElementById('listCard');
+  const list = document.getElementById('recList');
+  if (!recs.length) { card.style.display = 'none'; return; }
+  card.style.display = 'block'; list.innerHTML = '';
+  recs.forEach((r, i) => {
+    const el = document.createElement('div'); el.className = 'rec-item';
+    el.innerHTML = `<div class="rdot${r.sent ? ' sent' : ''}" id="rd-${i}"></div>
+      <div class="rec-info"><div class="rec-name">${r.name}</div><div class="rec-meta">${r.date.toLocaleDateString('fr-FR')} · ${tdmFormatDuration(r.dur)}</div></div>
+      <div class="rec-btns">
+        <button class="ib" onclick="playRec(${i})">▶</button>
+        <button class="ib g" onclick="sendOne(${i})" id="sb-${i}">↗</button>
+        <a class="ib" href="${r.url}" download="${r.name}">↓</a>
+        <button class="ib r" onclick="delRec(${i})">✕</button>
+      </div>
+      <audio id="au-${i}" src="${r.url}"></audio>`;
+    list.appendChild(el);
+  });
+}
+
+function playRec(i) {
+  const a = document.getElementById(`au-${i}`);
+  if (a.paused) { document.querySelectorAll('audio').forEach(x => x.pause()); a.play(); }
+  else { a.pause(); a.currentTime = 0; }
+}
+
+function delRec(i) { URL.revokeObjectURL(recs[i].url); recs.splice(i, 1); render(); }
+
+async function sendOne(i) {
+  const btn = document.getElementById(`sb-${i}`);
+  btn.classList.add('sb'); btn.textContent = '↻';
+  try {
+    const sender = await doSend(recs[i]);
+    recs[i].sent = true;
+    btn.classList.remove('sb'); btn.textContent = '✓';
+    btn.style.color = 'var(--green)'; btn.style.borderColor = 'var(--green)';
+    document.getElementById(`rd-${i}`)?.classList.add('sent');
+    toast('Envoyé ✓', 'ok');
+    // Redirection vers feedback
+    sessionStorage.setItem('tdm_type', 'audio');
+    sessionStorage.setItem('tdm_author', sender);
+    setTimeout(() => window.location.href = '/feedback?type=audio&author=' + encodeURIComponent(sender), 1200);
+  } catch(e) { btn.classList.remove('sb'); btn.textContent = '↗'; toast('Erreur : ' + e.message, 'err'); }
+}
+
+async function sendAll() {
+  const btn = document.getElementById('btnSendAll');
+  btn.disabled = true; btn.innerHTML = '<span class="spin">↻</span> Envoi…';
+  let ok = 0, lastSender = 'Anonyme';
+  for (let i = 0; i < recs.length; i++) {
+    try { lastSender = await doSend(recs[i]); recs[i].sent = true; ok++; } catch {}
+    render();
+  }
+  btn.disabled = false; btn.innerHTML = '↗ Envoyer tout';
+  if (ok > 0) {
+    toast(`${ok}/${recs.length} envoyé(s)`, ok === recs.length ? 'ok' : 'inf');
+    sessionStorage.setItem('tdm_type', 'audio');
+    sessionStorage.setItem('tdm_author', lastSender);
+    setTimeout(() => window.location.href = '/feedback?type=audio&author=' + encodeURIComponent(lastSender), 1500);
+  } else {
+    toast('Aucun envoi réussi.', 'err');
+  }
+}
+
+async function doSend(rec) {
+  const prenom = document.getElementById('prenomInput').value.trim();
+  const nom    = document.getElementById('nomInput').value.trim();
+  const sender = [prenom, nom].filter(Boolean).join(' ') || 'Anonyme';
+  const fd = new FormData();
+  fd.append('audio', rec.blob, rec.name);
+  fd.append('filename', rec.name);
+  fd.append('sender', sender);
+  fd.append('date', rec.date.toLocaleString('fr-FR'));
+  fd.append('duration', tdmFormatDuration(rec.dur));
+  const res  = await fetch('/api/send/audio', { method: 'POST', body: fd });
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || `HTTP ${res.status}`);
+  return sender;
+}
+</script>
+</body>
+</html>
