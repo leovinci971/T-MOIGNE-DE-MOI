@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#FDF6F0"/>
+  <title>Témoigne de moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/theme.css"/>
+  <style>
+    /* ── Écrans ──────────────────────────────────────────────── */
+    .screen { display:none; min-height:100vh; }
+    .screen.active { display:flex; flex-direction:column; }
+
+    /* ════════════════════════════════
+       SPLASH
+    ════════════════════════════════ */
+    #s-splash {
+      align-items:center; justify-content:center;
+      position:relative; overflow:hidden;
+      background:var(--bg);
+    }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(24px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity:0; } to { opacity:1; }
+    }
+    @keyframes expandLine {
+      from { width:0; opacity:0; }
+      to   { width:90px; opacity:1; }
+    }
+    @keyframes popBadge {
+      0%   { opacity:0; transform:scale(.7) translateY(8px); }
+      70%  { transform:scale(1.06) translateY(-2px); }
+      100% { opacity:1; transform:scale(1) translateY(0); }
+    }
+    @keyframes floatDot {
+      0%   { opacity:0; transform:translateY(0); }
+      20%  { opacity:.45; }
+      80%  { opacity:.25; }
+      100% { opacity:0; transform:translateY(-70px); }
+    }
+    @keyframes screenFade {
+      from { opacity:1; } to { opacity:0; }
+    }
+
+    .anim-l1    { animation:fadeUp     .6s ease .3s  both; }
+    .anim-l2    { animation:fadeUp     .6s ease .55s both; }
+    .anim-barL  { animation:expandLine .5s ease 1.0s both; }
+    .anim-barR  { animation:expandLine .5s ease 1.0s both; }
+    .anim-tag   { animation:fadeIn     .7s ease 1.3s both; }
+    .anim-badge { animation:popBadge   .5s ease 1.7s both; }
+
+    .dot1 { animation:floatDot 3s   ease .2s both; }
+    .dot2 { animation:floatDot 3.6s ease .6s both; }
+    .dot3 { animation:floatDot 2.8s ease 1s  both; }
+    .dot4 { animation:floatDot 3.2s ease .4s both; }
+    .dot5 { animation:floatDot 4s   ease .8s both; }
+
+    .fdot { position:absolute; border-radius:50%; pointer-events:none; }
+
+    #splash-inner { display:flex; flex-direction:column; align-items:center; position:relative; z-index:2; }
+
+    /* ════════════════════════════════
+       ÂGEGATE + CONSENTEMENT
+    ════════════════════════════════ */
+    .rgpd-screen {
+      align-items:center; justify-content:center;
+      padding:24px 16px 48px; background:var(--bg);
+      animation:fadeIn .4s ease both;
+    }
+
+    .rgpd-card {
+      background:#fff; border:1.5px solid var(--border);
+      border-radius:var(--r); overflow:hidden;
+      width:100%; max-width:460px;
+      box-shadow:0 4px 24px rgba(0,0,0,.07);
+    }
+
+    .rgpd-strip { height:4px; }
+    .strip-warm   { background:linear-gradient(90deg,var(--warm1),var(--warm2)); }
+    .strip-amber  { background:var(--warm2); }
+    .strip-danger { background:#E24B4A; }
+    .strip-success{ background:var(--green); }
+
+    .rgpd-body { padding:22px 20px; }
+
+    .rgpd-step {
+      font-size:.62rem; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--muted); margin-bottom:10px; font-weight:600;
+    }
+
+    .rgpd-h { font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:700; color:var(--text); margin-bottom:6px; }
+    .rgpd-sub { font-size:.84rem; color:var(--muted); line-height:1.6; margin-bottom:16px; }
+
+    .info-row {
+      display:flex; align-items:flex-start; gap:10px;
+      padding:10px 12px; background:var(--bg);
+      border-radius:10px; margin-bottom:8px;
+    }
+    .info-row i { font-size:18px; color:var(--muted); flex-shrink:0; margin-top:1px; }
+    .info-row p { font-size:.78rem; color:var(--text); margin:0; line-height:1.55; }
+    .info-row strong { display:block; font-weight:600; margin-bottom:2px; }
+
+    .note-box {
+      padding:10px 12px; border-radius:10px;
+      display:flex; align-items:flex-start; gap:8px; margin-bottom:14px;
+    }
+    .note-warn    { background:#FEF9EC; border:1px solid #F4B942; }
+    .note-danger  { background:#FEF0F0; border:1px solid #E24B4A; }
+    .note-success { background:#EAF6F1; border:1px solid var(--green); }
+    .note-box i   { font-size:16px; flex-shrink:0; margin-top:1px; }
+    .note-warn i    { color:#BA7517; }
+    .note-danger i  { color:#A32D2D; }
+    .note-success i { color:#3B6D11; }
+    .note-box p { font-size:.76rem; line-height:1.6; margin:0; }
+    .note-warn p    { color:#633806; }
+    .note-danger p  { color:#791F1F; }
+    .note-success p { color:#27500A; }
+
+    .cb-wrap {
+      padding:12px; background:var(--bg);
+      border-radius:10px; margin-bottom:14px;
+    }
+    .cb-wrap label {
+      display:flex; align-items:flex-start; gap:10px; cursor:pointer;
+      font-size:.8rem; color:var(--text); line-height:1.6;
+    }
+    .cb-wrap input { margin-top:3px; flex-shrink:0; accent-color:var(--warm1); width:16px; height:16px; }
+
+    .choice-btn {
+      width:100%; padding:12px 14px; background:#fff;
+      border:1.5px solid var(--border); border-radius:10px;
+      font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:500;
+      color:var(--text); cursor:pointer; display:flex;
+      align-items:center; justify-content:space-between;
+      margin-bottom:8px; transition:border-color .18s;
+    }
+    .choice-btn:hover { border-color:var(--warm1); }
+
+    .btn-primary {
+      width:100%; padding:12px; border:none; border-radius:10px;
+      background:linear-gradient(135deg,var(--warm1),var(--warm2));
+      color:#fff; font-family:'DM Sans',sans-serif;
+      font-size:.9rem; font-weight:600; cursor:pointer;
+      transition:opacity .2s; margin-bottom:8px;
+    }
+    .btn-primary:hover { opacity:.9; }
+    .btn-primary:disabled { opacity:.35; cursor:not-allowed; }
+    .btn-primary.green-btn { background:var(--green); }
+
+    .btn-ghost {
+      width:100%; padding:10px; background:transparent;
+      border:1.5px solid var(--border); border-radius:10px;
+      font-family:'DM Sans',sans-serif; font-size:.84rem;
+      color:var(--muted); cursor:pointer; transition:all .18s;
+    }
+    .btn-ghost:hover { border-color:var(--muted); color:var(--text); }
+
+    .legal-note {
+      text-align:center; margin-top:12px;
+      font-size:.68rem; color:var(--muted);
+    }
+    .legal-note a { color:var(--warm1); text-decoration:none; }
+
+    .blocked-icon {
+      width:56px; height:56px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center; margin:0 auto 14px;
+    }
+
+    /* ════════════════════════════════
+       PAGE D'ACCUEIL (après RGPD)
+    ════════════════════════════════ */
+    #s-home {
+      background:var(--bg); animation:fadeIn .5s ease both;
+    }
+
+    .hero { text-align:center; padding:32px 0 18px; }
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:9px;
+      padding:5px 16px; border-radius:30px;
+      background:rgba(232,130,90,.1); border:1px solid rgba(232,130,90,.22);
+      font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+      color:var(--warm3); margin-bottom:18px;
+    }
+    .badge-icon { width:20px; height:20px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .hero h1 {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(1.8rem,6vw,2.5rem);
+      font-weight:700; line-height:1.1; margin-bottom:10px; white-space:nowrap;
+    }
+    .hero h1 .accent { color:var(--warm1); }
+    .hero p { font-size:.95rem; color:var(--muted); line-height:1.65; font-weight:300; max-width:380px; margin:0 auto; }
+    .divider { width:50px; height:3px; background:linear-gradient(90deg,var(--warm1),var(--warm2)); border-radius:2px; margin:16px auto; }
+    .question { font-size:.72rem; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); text-align:center; margin-bottom:14px; }
+
+    .modes { width:100%; display:flex; flex-direction:column; gap:12px; }
+    .mode-card {
+      background:#fff; border:1.5px solid var(--border);
+      border-radius:var(--r); padding:18px 20px;
+      display:flex; align-items:center; gap:16px;
+      text-decoration:none; color:var(--text);
+      position:relative; overflow:hidden; box-shadow:var(--shadow);
+      transition:all .22s cubic-bezier(.34,1.56,.64,1);
+    }
+    .mode-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--c); opacity:0; transition:opacity .2s; }
+    .mode-card:hover { transform:translateY(-3px); border-color:var(--c); box-shadow:0 8px 28px rgba(0,0,0,.1); }
+    .mode-card:hover::before { opacity:1; }
+    .mode-icon { width:52px; height:52px; border-radius:13px; flex-shrink:0; background:color-mix(in srgb,var(--c) 12%,transparent); display:flex; align-items:center; justify-content:center; font-size:24px; }
+    .mode-info { flex:1; }
+    .mode-title { font-size:.96rem; font-weight:600; margin-bottom:3px; display:flex; align-items:center; gap:8px; }
+    .mode-tag { font-size:.58rem; padding:2px 8px; border-radius:20px; background:color-mix(in srgb,var(--c) 12%,transparent); color:var(--c); letter-spacing:.08em; text-transform:uppercase; }
+    .mode-desc { font-size:.82rem; color:var(--muted); line-height:1.5; }
+    .mode-arrow { font-size:17px; color:var(--border); flex-shrink:0; transition:all .2s; }
+    .mode-card:hover .mode-arrow { color:var(--c); transform:translateX(3px); }
+
+    .footer-note { text-align:center; font-size:.7rem; color:var(--muted); line-height:1.7; padding:16px 0 4px; }
+    .rgpd-footer {
+      text-align:center; padding:10px 16px;
+      font-size:.68rem; color:var(--muted);
+      border-top:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;
+    }
+    .rgpd-footer a { color:var(--warm1); text-decoration:none; }
+
+    .admin-fab {
+      position:fixed; bottom:20px; right:16px;
+      padding:6px 14px; border-radius:20px;
+      background:rgba(255,255,255,.85); backdrop-filter:blur(8px);
+      border:1px solid var(--border); font-size:.68rem;
+      color:var(--muted); text-decoration:none; transition:all .2s; z-index:100;
+    }
+    .admin-fab:hover { border-color:var(--warm1); color:var(--warm1); }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     ÉCRAN 1 — SPLASH ANIMÉ
+═════════════════════════════════════════ -->
+<div class="screen active" id="s-splash">
+  <div class="fdot dot1" style="left:10%;bottom:22%;width:8px;height:8px;background:var(--warm1);"></div>
+  <div class="fdot dot2" style="left:22%;bottom:14%;width:5px;height:5px;background:var(--warm2);"></div>
+  <div class="fdot dot3" style="left:72%;bottom:26%;width:7px;height:7px;background:var(--green);"></div>
+  <div class="fdot dot4" style="left:82%;bottom:16%;width:4px;height:4px;background:var(--warm1);"></div>
+  <div class="fdot dot5" style="left:55%;bottom:12%;width:6px;height:6px;background:var(--blue);"></div>
+
+  <div id="splash-inner">
+    <div class="anim-l1" style="font-family:'Playfair Display',serif;font-size:clamp(2.4rem,8vw,3.6rem);font-weight:700;color:var(--text);letter-spacing:-.5px;line-height:1;text-align:center;">
+      Témoigne
+    </div>
+    <div class="anim-l2" style="font-family:'Playfair Display',serif;font-size:clamp(2.4rem,8vw,3.6rem);font-weight:700;color:var(--warm1);letter-spacing:-.5px;line-height:1;text-align:center;margin-top:4px;">
+      de moi
+    </div>
+
+    <div style="display:flex;align-items:center;gap:14px;margin-top:16px;">
+      <div class="anim-barL" style="height:2px;background:var(--warm1);border-radius:2px;"></div>
+      <div class="anim-barR" style="height:2px;background:var(--warm1);border-radius:2px;"></div>
+    </div>
+
+    <div class="anim-tag" style="font-size:.72rem;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;margin-top:14px;">
+      Votre voix · Votre histoire
+    </div>
+
+    <div class="anim-badge" style="margin-top:18px;display:inline-flex;align-items:center;gap:7px;padding:5px 16px;border-radius:30px;background:rgba(232,130,90,.1);border:1px solid rgba(232,130,90,.25);font-size:.68rem;color:var(--warm3);letter-spacing:.1em;text-transform:uppercase;">
+      💬 Partagez votre témoignage
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ÉCRAN 2 — VÉRIFICATION D'ÂGE
+═════════════════════════════════════════ -->
+<div class="screen rgpd-screen" id="s-age">
+  <div class="rgpd-card">
+    <div class="rgpd-strip strip-warm"></div>
+    <div class="rgpd-body">
+      <div class="rgpd-step">Étape 1 sur 2 — Vérification</div>
+      <div class="rgpd-h">Avant de commencer</div>
+      <p class="rgpd-sub">Cette application collecte des témoignages de nature religieuse. Nous devons vérifier votre âge conformément au RGPD.</p>
+
+      <div class="note-box note-warn">
+        <i>ℹ️</i>
+        <p>En France, l'âge de référence pour le consentement numérique est fixé à <strong>15 ans</strong> (Art. 8 RGPD — loi Informatique et Libertés). En dessous de cet âge, le consentement d'un représentant légal est obligatoire.</p>
+      </div>
+
+      <p style="font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:12px;">Avez-vous 15 ans ou plus ?</p>
+
+      <button class="choice-btn" onclick="go('consent')">
+        <span>✅ Oui, j'ai 15 ans ou plus</span>
+        <span style="color:var(--muted);">→</span>
+      </button>
+      <button class="choice-btn" onclick="go('mineur')">
+        <span>⚠️ Non, je suis mineur(e)</span>
+        <span style="color:var(--muted);">→</span>
+      </button>
+
+      <div class="legal-note">
+        <a href="/confidentialite" target="_blank">Politique de confidentialité</a> · <a href="https://www.cnil.fr" target="_blank">cnil.fr</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ÉCRAN 3 — CONSENTEMENT MAJEUR
+═════════════════════════════════════════ -->
+<div class="screen rgpd-screen" id="s-consent">
+  <div class="rgpd-card">
+    <div class="rgpd-strip strip-warm"></div>
+    <div class="rgpd-body">
+      <div class="rgpd-step">Étape 2 sur 2 — Consentement</div>
+      <div class="rgpd-h">Vos témoignages, votre choix</div>
+      <p class="rgpd-sub">Données de nature religieuse — Art. 9 RGPD.</p>
+
+      <div class="info-row">
+        <i>👤</i>
+        <p><strong>Anonymat possible</strong>Le champ nom est facultatif. Ne rien saisir = témoignage anonyme.</p>
+      </div>
+      <div class="info-row">
+        <i>📷</i>
+        <p><strong>Image uniquement si vous l'activez</strong>La caméra n'est jamais démarrée automatiquement.</p>
+      </div>
+      <div class="info-row" style="margin-bottom:14px;">
+        <i>📖</i>
+        <p><strong>Usage : édification des fidèles</strong>Conservé et partagé en cadre communautaire. Jamais cédé à des tiers commerciaux.</p>
+      </div>
+
+      <div class="cb-wrap">
+        <label>
+          <input type="checkbox" id="cbMajeur" onchange="toggleBtn('btnMajeur','cbMajeur')"/>
+          J'accepte que mon témoignage, de nature religieuse, soit collecté, conservé et potentiellement partagé à des fins d'édification. Je comprends mes droits RGPD et peux demander la suppression à tout moment.
+        </label>
+      </div>
+
+      <button class="btn-primary" id="btnMajeur" disabled onclick="acceptConsent('majeur')">
+        ✓ Continuer et témoigner
+      </button>
+      <button class="btn-ghost" onclick="go('age')">Je refuse — retour à l'étape 1</button>
+
+      <div class="legal-note">
+        <a href="/confidentialite" target="_blank">Politique de confidentialité</a> · <a href="https://www.cnil.fr" target="_blank">cnil.fr</a>
+        · Droits RGPD : <span id="contactEmailConsent">contact@votre-eglise.fr</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ÉCRAN 4 — MINEUR (représentant légal)
+═════════════════════════════════════════ -->
+<div class="screen rgpd-screen" id="s-mineur">
+  <div class="rgpd-card">
+    <div class="rgpd-strip strip-amber"></div>
+    <div class="rgpd-body">
+      <div class="rgpd-step">Mineur(e) détecté(e)</div>
+      <div class="rgpd-h">Présence d'un représentant légal ?</div>
+      <p class="rgpd-sub">Sans validation parentale, aucun témoignage ne peut être enregistré.</p>
+
+      <div class="note-box note-warn" style="margin-bottom:14px;">
+        <i>⚠️</i>
+        <p>Vous avez indiqué avoir moins de 15 ans. Conformément à l'Art. 8 du RGPD, le consentement d'un représentant légal est <strong>obligatoire</strong>.</p>
+      </div>
+
+      <div class="cb-wrap">
+        <label>
+          <input type="checkbox" id="cbMineur" onchange="toggleBtn('btnMineur','cbMineur')"/>
+          <span><strong style="display:block;margin-bottom:3px;">En tant que représentant légal,</strong>
+          je confirme avoir lu la politique de confidentialité et consens à ce que le témoignage de l'enfant, de nature religieuse, soit collecté, conservé et partagé à des fins d'édification communautaire.</span>
+        </label>
+      </div>
+
+      <button class="btn-primary" id="btnMineur" disabled onclick="acceptConsent('mineur_rl')">
+        ✓ Le représentant légal valide — continuer
+      </button>
+      <button class="btn-ghost" onclick="go('blocked')">Aucun représentant légal disponible</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ÉCRAN 5 — BLOQUÉ
+═════════════════════════════════════════ -->
+<div class="screen rgpd-screen" id="s-blocked">
+  <div class="rgpd-card">
+    <div class="rgpd-strip strip-danger"></div>
+    <div class="rgpd-body" style="text-align:center;">
+      <div class="blocked-icon" style="background:#FEF0F0;">
+        <span style="font-size:26px;">🚫</span>
+      </div>
+      <div class="rgpd-h">Témoignage non autorisé</div>
+      <p class="rgpd-sub">Sans la présence et la validation d'un représentant légal, il n'est pas possible d'enregistrer ce témoignage.</p>
+
+      <div class="note-box note-danger" style="text-align:left;">
+        <i>ℹ️</i>
+        <p>Tout témoignage soumis sans consentement parental valide sera <strong>supprimé systématiquement</strong>, sans conservation ni traitement.</p>
+      </div>
+
+      <button class="btn-ghost" onclick="go('age')">← Retour à l'étape 1</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ÉCRAN 6 — PAGE D'ACCUEIL
+═════════════════════════════════════════ -->
+<div class="screen" id="s-home">
+  <div class="topbar">
+    <a href="/" class="topbar-logo">
+      <div class="topbar-icon" id="topbarIcon">
+        <svg viewBox="0 0 24 24" fill="white" width="16" height="16"><rect x="10" y="2" width="4" height="20" rx="1"/><rect x="2" y="8" width="20" height="4" rx="1"/></svg>
+      </div>
+      <span id="topbarTitle">Témoigne de moi</span>
+    </a>
+  </div>
+
+  <div class="wrap" style="align-items:center;">
+    <div class="hero">
+      <div class="hero-badge">
+        <div class="badge-icon" id="badgeIcon">
+          <svg viewBox="0 0 20 20" fill="#C4714A" width="18" height="18"><rect x="8.5" y="1" width="3" height="18" rx="1"/><rect x="1" y="7" width="18" height="3" rx="1"/></svg>
+        </div>
+        <span id="badgeText">Votre voix compte</span>
+      </div>
+      <h1 id="heroTitle">Témoigne <span class="accent">de moi</span></h1>
+      <p id="heroSubtitle">Partagez votre expérience sous la forme qui vous convient — en quelques secondes.</p>
+      <div class="divider"></div>
+    </div>
+
+    <div class="question">Comment souhaitez-vous témoigner ?</div>
+
+    <div class="modes">
+      <a class="mode-card" href="/audio" style="--c:#E8825A;">
+        <div class="mode-icon">🎙</div>
+        <div class="mode-info">
+          <div class="mode-title">Message vocal <span class="mode-tag" style="--c:#E8825A;">Audio</span></div>
+          <div class="mode-desc">Enregistrez votre témoignage à la voix — rapide et naturel</div>
+        </div>
+        <div class="mode-arrow">→</div>
+      </a>
+      <a class="mode-card" href="/video" style="--c:#5B8DB8;">
+        <div class="mode-icon">🎥</div>
+        <div class="mode-info">
+          <div class="mode-title">Message vidéo <span class="mode-tag" style="--c:#5B8DB8;">Vidéo</span></div>
+          <div class="mode-desc">Filmez-vous pour un témoignage plus personnel et expressif</div>
+        </div>
+        <div class="mode-arrow">→</div>
+      </a>
+      <a class="mode-card" href="/ecrit" style="--c:#6BAE8E;">
+        <div class="mode-icon">✍️</div>
+        <div class="mode-info">
+          <div class="mode-title">Message écrit <span class="mode-tag" style="--c:#6BAE8E;">Texte</span></div>
+          <div class="mode-desc">Rédigez librement votre témoignage à votre rythme</div>
+        </div>
+        <div class="mode-arrow">→</div>
+      </a>
+    </div>
+
+    <div class="footer-note">Vos témoignages sont envoyés de façon sécurisée.<br>Merci pour votre confiance. 🙏</div>
+
+    <div class="rgpd-footer">
+      <span>🛡️ Données religieuses traitées conformément au RGPD Art. 9</span>
+      <span>·</span>
+      <a href="/confidentialite" target="_blank">Confidentialité</a>
+      <span>·</span>
+      <a href="https://www.cnil.fr" target="_blank">CNIL</a>
+      <span>·</span>
+      <a id="footerContact" href="#">contact@votre-eglise.fr</a>
+    </div>
+  </div>
+
+  <a href="/admin" class="admin-fab">⚙ Admin</a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+// ── Navigation entre écrans ───────────────────────────────────────
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── Activation bouton consentement ────────────────────────────────
+function toggleBtn(btnId, cbId) {
+  const cb  = document.getElementById(cbId);
+  const btn = document.getElementById(btnId);
+  btn.disabled = !cb.checked;
+}
+
+// ── Acceptation consentement — cookie HttpOnly via serveur ────────
+async function acceptConsent(type) {
+  const btnId = type === 'majeur' ? 'btnMajeur' : 'btnMineur';
+  const btn   = document.getElementById(btnId);
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-block;animation:spin .7s linear infinite">↻</span> Validation…';
+  try {
+    const res  = await fetch('/api/consent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type }),
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Erreur serveur');
+    go('home');
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = type === 'majeur'
+      ? '✓ Continuer et témoigner'
+      : '✓ Le représentant légal valide — continuer';
+    toast('Erreur : ' + e.message, 'err');
+  }
+}
+
+// ── Vérification consentement côté serveur ────────────────────────
+async function checkConsent() {
+  try {
+    const res  = await fetch('/api/consent/check');
+    const json = await res.json();
+    return json.ok === true;
+  } catch { return false; }
+}
+
+// ── Démarrage : splash puis flux RGPD ────────────────────────────
+window.addEventListener('load', async () => {
+  const already = await checkConsent();
+  if (already) { go('home'); return; }
+  setTimeout(() => {
+    const splash = document.getElementById('s-splash');
+    splash.style.transition = 'opacity .5s ease';
+    splash.style.opacity = '0';
+    setTimeout(() => go('age'), 500);
+  }, 2800);
+});
+
+// ── Config dynamique ──────────────────────────────────────────────
+fetch('/api/config').then(r => r.json()).then(cfg => {
+  if (cfg.appTitle)  { document.getElementById('topbarTitle').textContent = cfg.appTitle; document.title = cfg.appTitle; }
+  if (cfg.logoDataUrl) {
+    document.getElementById('topbarIcon').innerHTML =
+      `<img src="${cfg.logoDataUrl}" alt="Logo" style="width:22px;height:22px;border-radius:4px;object-fit:cover;">`;
+    document.getElementById('badgeIcon').innerHTML =
+      `<img src="${cfg.logoDataUrl}" alt="Logo" style="width:20px;height:20px;border-radius:3px;object-fit:cover;">`;
+  }
+  if (cfg.badgeText)   document.getElementById('badgeText').textContent   = cfg.badgeText;
+  if (cfg.appSubtitle) document.getElementById('heroSubtitle').textContent = cfg.appSubtitle;
+  if (cfg.heroTitle) {
+    const p = cfg.heroTitle.split('|');
+    document.getElementById('heroTitle').innerHTML = p[0] + (p[1] ? ` <span class="accent">${p[1]}</span>` : '');
+  }
+  if (cfg.contactEmail) {
+    const em = cfg.contactEmail;
+    const e1 = document.getElementById('contactEmailConsent');
+    const e2 = document.getElementById('footerContact');
+    if (e1) e1.innerHTML = `<a href="mailto:${em}" style="color:var(--warm1)">${em}</a>`;
+    if (e2) { e2.href = `mailto:${em}`; e2.textContent = em; }
+  }
+}).catch(() => {});
+
+let tT;
+function toast(msg, type='inf') {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.className = `toast ${type} show`;
+  el.textContent = msg;
+  clearTimeout(tT); tT = setTimeout(() => el.classList.remove('show'), 3500);
+}
+</script>
+</body>
