@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Témoignage écrit — Témoigne de moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin/>
+  <link rel="stylesheet" href="/theme.css"/>
+  <!-- app.js en synchrone — doit être disponible avant TinyMCE -->
+  <script src="/app.js"></script>
+  <style>
+    /* ── Bande récap compacte (remplace les 2 cards) ─────────── */
+    .recap-band {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: .72rem;
+      color: var(--muted);
+      min-height: 0;
+    }
+    .recap-band.show { display: flex; }
+    .recap-sep { color: var(--border); }
+    .recap-modify {
+      margin-left: auto;
+      font-size: .7rem;
+      color: var(--muted);
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .recap-modify:hover { color: var(--warm1); }
+
+    /* ── Blocs rétractables ──────────────────────────────────── */
+    .collapsible {
+      max-height: 400px;
+      opacity: 1;
+      overflow: hidden;
+      transition: max-height .35s ease, opacity .25s ease;
+    }
+    .collapsible.collapsed {
+      max-height: 0 !important;
+      opacity: 0;
+    }
+
+    /* ── Barre dictée ────────────────────────────────────────── */
+    .dictee-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r) var(--r) 0 0;
+      flex-wrap: wrap;
+    }
+    .dictee-bar-title {
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .lang-sel {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: .82rem;
+      padding: 6px 10px;
+      outline: none;
+      cursor: pointer;
+      flex: 1;
+      min-width: 110px;
+    }
+    .btn-dictee {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 16px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: .88rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--warm1), var(--warm2));
+      color: #fff;
+      box-shadow: 0 3px 12px rgba(232,130,90,.35);
+      transition: all .2s cubic-bezier(.34,1.56,.64,1);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .btn-dictee:hover  { opacity:.9; transform:translateY(-1px); }
+    .btn-dictee:active { transform:scale(.97); }
+    .btn-dictee.listening {
+      background: linear-gradient(135deg, #d44, #b33);
+      box-shadow: 0 3px 12px rgba(212,68,68,.4);
+      animation: dictPulse 1.6s ease-in-out infinite;
+    }
+    @keyframes dictPulse {
+      0%,100% { box-shadow:0 3px 12px rgba(212,68,68,.3); }
+      50%      { box-shadow:0 3px 20px rgba(212,68,68,.6); }
+    }
+
+    /* ── Bandeau interim ─────────────────────────────────────── */
+    .interim-bar {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      padding: 0 14px;
+      background: rgba(232,130,90,.07);
+      border-left: 3px solid var(--warm1);
+      font-size: .82rem;
+      color: var(--warm3);
+      font-style: italic;
+      line-height: 1.5;
+      transition: max-height .3s ease, opacity .25s ease, padding .3s ease;
+    }
+    .interim-bar.show {
+      max-height: 60px;
+      opacity: 1;
+      padding: 8px 14px;
+    }
+    .interim-cursor {
+      display: inline-block;
+      animation: blink .8s step-end infinite;
+      font-style: normal;
+      font-weight: 600;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ── TinyMCE wrapper ─────────────────────────────────────── */
+    .tox-wrap {
+      border-radius: 0 0 var(--r) var(--r);
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+      border-top: none;
+    }
+    .tox-wrap .tox.tox-tinymce { border:none !important; height:340px !important; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/" class="topbar-logo">
+    <div class="topbar-icon" id="topbarIcon">
+      <svg viewBox="0 0 24 24" fill="white" width="16" height="16"><rect x="10" y="2" width="4" height="20" rx="1"/><rect x="2" y="8" width="20" height="4" rx="1"/></svg>
+    </div>
+    <span id="topbarTitle">Témoigne de moi</span>
+  </a>
+</div>
+
+<div class="wrap">
+  <a href="/" class="back">← Choisir un autre mode</a>
+
+  <div class="page-header">
+    <div class="page-icon" style="background:rgba(107,174,142,.12);">✍️</div>
+    <h1>Témoignage écrit</h1>
+    <p>Rédigez librement ou dictez votre message</p>
+  </div>
+
+  <!-- ── Bande récap compacte (cachée au départ) ────────────── -->
+  <div class="recap-band" id="recapBand">
+    <span id="recapTitre">🏷 Sans titre</span>
+    <span class="recap-sep">·</span>
+    <span id="recapIdent">👤 Anonyme</span>
+    <button class="recap-modify" onclick="expand()">Modifier</button>
+  </div>
+
+  <!-- ── Champs (visibles au départ) ───────────────────────── -->
+  <div class="collapsible" id="fieldsBlock">
+
+    <!-- Titre -->
+    <div class="card" style="margin-bottom:0;border-radius:var(--r) var(--r) 0 0;border-bottom:none;">
+      <div class="field" style="margin-bottom:0;">
+        <input type="text" id="subjectInput"
+               placeholder="Titre de votre témoignage (facultatif)"
+               maxlength="80"/>
+      </div>
+    </div>
+
+    <!-- Identité -->
+    <div class="card" style="border-radius:0 0 var(--r) var(--r);">
+      <div class="field">
+        <input type="text" id="prenomInput"
+               placeholder="Prénom (facultatif)"
+               maxlength="40"
+               autocomplete="given-name"/>
+      </div>
+      <div class="field">
+        <input type="text" id="nomInput"
+               placeholder="Nom (facultatif)"
+               maxlength="40"
+               autocomplete="family-name"/>
+      </div>
+      <div class="field-anon" style="margin-bottom:0;">
+        <span class="anon-icon">👤</span> Laisser vide = témoignage anonyme
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Éditeur + Dictée ───────────────────────────────────── -->
+  <div style="box-shadow:var(--shadow);border-radius:var(--r);">
+
+    <!-- Barre dictée -->
+    <div class="dictee-bar">
+      <span class="dictee-bar-title">🎙 Dictée</span>
+      <select class="lang-sel" id="langSel">
+        <option value="fr-FR">🇫🇷 Français</option>
+        <option value="en-US">🇺🇸 English</option>
+        <option value="es-ES">🇪🇸 Español</option>
+        <option value="de-DE">🇩🇪 Deutsch</option>
+        <option value="it-IT">🇮🇹 Italiano</option>
+        <option value="pt-PT">🇵🇹 Português</option>
+        <option value="ar-SA">🇸🇦 العربية</option>
+      </select>
+      <button class="btn-dictee" id="btnDictee" onclick="onDicteeClick()">
+        <span id="dicteeIcon">🎙</span>
+        <span id="dicteeLabel">Dicter</span>
+      </button>
+    </div>
+
+    <!-- Texte interim dictée -->
+    <div class="interim-bar" id="interimBar">
+      <span id="interimText">En attente de la parole…</span><span class="interim-cursor">|</span>
+    </div>
+
+    <!-- TinyMCE — zone de saisie manuelle -->
+    <div class="tox-wrap">
+      <textarea id="editor"></textarea>
+    </div>
+
+  </div>
+
+  <button class="btn btn-primary" id="btnSend" onclick="send()">✉️ Envoyer mon témoignage</button>
+</div>
+
+<a href="/feedback?type=ecrit" class="feedback-fab" onclick="sessionStorage.setItem('tdm_type','ecrit')">
+  <span class="fi">⭐</span> Je donne mon avis
+</a>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+// ── 1. Charger la config puis injecter TinyMCE ────────────────────
+// app.js est chargé en synchrone donc tdmLoadConfig() est disponible ici.
+// On attend la config AVANT d'injecter TinyMCE pour passer la bonne clé.
+(async function boot() {
+  const cfg = await tdmLoadConfig();
+  const key = (cfg && cfg.tinymceKey) ? cfg.tinymceKey : 'no-api-key';
+  injectTinyMCE(key);
+})();
+
+function injectTinyMCE(key) {
+  const s = document.createElement('script');
+  s.src = 'https://cdn.tiny.cloud/1/' + key + '/tinymce/8/tinymce.min.js';
+  s.referrerPolicy = 'origin';
+  s.crossOrigin    = 'anonymous';
+  // onload = TinyMCE est disponible dans le scope global → on peut init
+  s.onload = function() {
+    tinymce.init({
+      selector:  '#editor',
+      menubar:   false,
+      statusbar: false,
+      resize:    false,
+      plugins:   ['autolink','lists','link','searchreplace','wordcount','emoticons'],
+      toolbar:   'undo redo | styles | bold italic underline | forecolor | alignleft aligncenter alignright | bullist numlist | link | emoticons | removeformat',
+      skin:      'oxide',
+      content_style: 'body{font-family:"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.78;color:#2A1F1A;background:#FDF6F0;padding:16px 20px;margin:0;}p{margin:0 0 10px;}',
+      placeholder: 'Partagez votre expérience…',
+      setup: function(ed) {
+        // Collapse dès que le focus passe dans l'éditeur
+        ed.on('focus', function() { collapse(); });
+      },
+    });
+  };
+  s.onerror = function() {
+    // Fallback si le CDN échoue : réessayer sans clé
+    if (key !== 'no-api-key') injectTinyMCE('no-api-key');
+  };
+  document.head.appendChild(s);
+}
+
+// ── 2. Collapse / Expand ──────────────────────────────────────────
+let isCollapsed = false;
+
+function collapse() {
+  if (isCollapsed) return;
+  isCollapsed = true;
+
+  // Lire les valeurs
+  const titre  = document.getElementById('subjectInput').value.trim();
+  const prenom = document.getElementById('prenomInput').value.trim();
+  const nom    = document.getElementById('nomInput').value.trim();
+  const ident  = [prenom, nom].filter(Boolean).join(' ') || 'Anonyme';
+
+  // Mettre à jour la bande
+  document.getElementById('recapTitre').textContent = '🏷 ' + (titre || 'Sans titre');
+  document.getElementById('recapIdent').textContent = '👤 ' + ident;
+
+  // Rétracter le bloc
+  document.getElementById('fieldsBlock').classList.add('collapsed');
+
+  // Afficher la bande
+  document.getElementById('recapBand').classList.add('show');
+}
+
+function expand() {
+  if (!isCollapsed) return;
+  isCollapsed = false;
+
+  document.getElementById('fieldsBlock').classList.remove('collapsed');
+  document.getElementById('recapBand').classList.remove('show');
+
+  // Focus sur le titre
+  setTimeout(function() {
+    document.getElementById('subjectInput').focus();
+  }, 50);
+}
+
+// ── 3. Dictée vocale ──────────────────────────────────────────────
+let recog = null, listening = false;
+
+function onDicteeClick() {
+  // Collapse avant de dicter
+  collapse();
+  listening ? stopVoice() : startVoice();
+}
+
+function initSpeech() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    toast('Dictée non supportée sur ce navigateur. Utilisez Chrome.', 'err');
+    return false;
+  }
+  recog = new SR();
+  recog.continuous      = true;
+  recog.interimResults  = true;
+  recog.lang            = document.getElementById('langSel').value;
+
+  recog.onstart  = function() { listening = true;  setDicteeUI(true);  };
+  recog.onend    = function() {
+    if (listening) { try { recog.start(); } catch(e) { stopVoice(); } }
+  };
+  recog.onerror  = function(e) {
+    if (e.error === 'no-speech')    return;
+    if (e.error === 'not-allowed')  { toast('Microphone refusé.', 'err'); stopVoice(); }
+  };
+  recog.onresult = function(e) {
+    var interim = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      var t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) {
+        // Insérer dans TinyMCE à la position du curseur
+        var ed = tinymce.get('editor');
+        if (ed) ed.execCommand('mceInsertContent', false, t + ' ');
+      } else {
+        interim += t;
+      }
+    }
+    document.getElementById('interimText').textContent =
+      interim || 'En attente de la parole…';
+  };
+  return true;
+}
+
+function startVoice() {
+  if (!recog && !initSpeech()) return;
+  recog.lang = document.getElementById('langSel').value;
+  try { recog.start(); } catch(e) {}
+}
+
+function stopVoice() {
+  listening = false;
+  try { recog && recog.stop(); } catch(e) {}
+  setDicteeUI(false);
+  document.getElementById('interimText').textContent = 'En attente de la parole…';
+  toast('Dictée terminée ✓', 'ok');
+}
+
+function setDicteeUI(on) {
+  document.getElementById('btnDictee').classList.toggle('listening', on);
+  document.getElementById('dicteeIcon').textContent  = on ? '⏹' : '🎙';
+  document.getElementById('dicteeLabel').textContent = on ? 'Arrêter' : 'Dicter';
+  document.getElementById('interimBar').classList.toggle('show', on);
+}
+
+// ── 4. Envoi ──────────────────────────────────────────────────────
+async function send() {
+  if (listening) stopVoice();
+
+  var ed = tinymce.get('editor');
+  if (!ed) { toast('Éditeur non chargé. Attendez quelques secondes.', 'err'); return; }
+
+  var html = ed.getContent();
+  var text = ed.getContent({ format: 'text' });
+  if (!text.trim()) { toast('Veuillez rédiger votre témoignage.', 'err'); return; }
+
+  var prenom  = document.getElementById('prenomInput').value.trim();
+  var nom     = document.getElementById('nomInput').value.trim();
+  var sender  = ([prenom, nom].filter(Boolean).join(' ')) || 'Anonyme';
+  var subject = document.getElementById('subjectInput').value.trim();
+
+  var btn = document.getElementById('btnSend');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin">↻</span> Envoi…';
+
+  try {
+    var res  = await fetch('/api/send/ecrit', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        sender:      sender,
+        subject:     subject,
+        htmlContent: html,
+        textContent: text,
+      }),
+    });
+    var json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+    sessionStorage.setItem('tdm_type',   'ecrit');
+    sessionStorage.setItem('tdm_author', sender);
+    window.location.href = '/feedback?type=ecrit&author=' + encodeURIComponent(sender);
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = '✉️ Envoyer mon témoignage';
+    toast('Erreur : ' + e.message, 'err');
+  }
+}
+</script>
+</body>
+</html>
