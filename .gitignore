@@ -1,0 +1,16 @@
+# Dépendances
+node_modules/
+
+# Variables d'environnement (clés API, mots de passe)
+.env
+
+# Configuration sauvegardée par l'admin (peut contenir mots de passe, credentials)
+config.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
