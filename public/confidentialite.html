@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex"/>
+  <title>Politique de confidentialité — Témoigne de moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin/>
+  <link rel="stylesheet" href="/theme.css"/>
+  <script src="/app.js" defer></script>
+  <style>
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 50% 30% at 50% -5%,rgba(107,174,142,.12) 0%,transparent 50%);}
+    .wrap{position:relative;z-index:1;max-width:680px;}
+    .priv-hero{text-align:center;padding:32px 0 28px;border-bottom:1px solid var(--border);margin-bottom:32px;}
+    .priv-badge{display:inline-flex;align-items:center;gap:7px;padding:5px 16px;border-radius:30px;background:rgba(107,174,142,.1);border:1px solid rgba(107,174,142,.25);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:16px;}
+    .priv-hero h1{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;margin-bottom:10px;line-height:1.2;}
+    .priv-hero h1 em{color:var(--warm1);font-style:normal;}
+    .priv-hero p{font-size:.9rem;color:var(--muted);max-width:460px;margin:0 auto;line-height:1.7;}
+    .priv-date{display:inline-block;margin-top:14px;padding:3px 12px;border-radius:20px;background:var(--bg);border:1px solid var(--border);font-size:.68rem;color:var(--muted);}
+    .toc{background:#fff;border:1.5px solid var(--border);border-radius:var(--r);padding:18px 22px;margin-bottom:28px;}
+    .toc-title{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;font-weight:600;}
+    .toc-item{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-size:.84rem;padding:5px 0;border-bottom:1px solid transparent;transition:all .18s;}
+    .toc-item:hover{color:var(--warm1);border-bottom-color:rgba(232,130,90,.3);}
+    .toc-num{font-size:.65rem;color:var(--muted);width:20px;flex-shrink:0;}
+    .priv-section{margin-bottom:36px;scroll-margin-top:60px;}
+    .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:10px;border-bottom:1.5px solid var(--border);}
+    .sec-num{width:34px;height:34px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,var(--warm1),var(--warm2));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:.9rem;font-weight:700;color:#fff;}
+    .sec-head h2{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;}
+    .priv-text{font-size:.9rem;color:#3a2e28;line-height:1.78;margin-bottom:10px;}
+    .data-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.82rem;}
+    .data-table th{background:var(--text);color:#fff;padding:9px 13px;text-align:left;font-weight:600;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;}
+    .data-table th:first-child{border-radius:9px 0 0 0;}
+    .data-table th:last-child{border-radius:0 9px 0 0;}
+    .data-table td{padding:9px 13px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;}
+    .data-table tr:last-child td{border-bottom:none;}
+    .data-table tr:nth-child(even) td{background:var(--bg);}
+    .infobox{display:flex;gap:11px;padding:12px 14px;border-radius:11px;margin:12px 0;}
+    .ib-green{background:rgba(107,174,142,.08);border:1px solid rgba(107,174,142,.25);}
+    .ib-orange{background:rgba(232,130,90,.07);border:1px solid rgba(232,130,90,.2);}
+    .ib-blue{background:rgba(91,141,184,.07);border:1px solid rgba(91,141,184,.2);}
+    .infobox-icon{font-size:17px;flex-shrink:0;margin-top:1px;}
+    .infobox p{font-size:.82rem;line-height:1.6;margin:0;}
+    .ib-green p{color:#2a5a42;}
+    .ib-orange p{color:#7a3e1a;}
+    .ib-blue p{color:#2a4a6a;}
+    .rights-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0;}
+    @media(max-width:480px){.rights-grid{grid-template-columns:1fr;}}
+    .right-item{padding:13px;border-radius:11px;background:#fff;border:1.5px solid var(--border);}
+    .right-icon{font-size:20px;margin-bottom:7px;display:block;}
+    .right-title{font-weight:600;font-size:.86rem;margin-bottom:3px;}
+    .right-desc{font-size:.76rem;color:var(--muted);line-height:1.5;}
+    .contact-card{background:linear-gradient(135deg,rgba(232,130,90,.07),rgba(244,185,66,.05));border:1.5px solid rgba(232,130,90,.18);border-radius:var(--r);padding:20px;text-align:center;margin-top:12px;}
+    .contact-card h3{font-family:'Playfair Display',serif;font-size:1.05rem;margin-bottom:8px;}
+    .contact-card p{font-size:.84rem;color:var(--muted);margin-bottom:12px;}
+    .contact-email{display:inline-block;padding:9px 20px;background:var(--warm1);color:#fff;border-radius:9px;text-decoration:none;font-weight:600;font-size:.86rem;transition:opacity .2s;}
+    .contact-email:hover{opacity:.88;}
+    .priv-footer{text-align:center;padding:22px 0 0;border-top:1px solid var(--border);font-size:.74rem;color:var(--muted);line-height:1.8;}
+    .priv-footer a{color:var(--warm1);text-decoration:none;}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/" class="topbar-logo">
+    <div class="topbar-icon" id="topbarIcon">
+      <svg viewBox="0 0 24 24" fill="white" width="16" height="16"><rect x="10" y="2" width="4" height="20" rx="1"/><rect x="2" y="8" width="20" height="4" rx="1"/></svg>
+    </div>
+    <span id="topbarTitle">Témoigne de moi</span>
+  </a>
+</div>
+
+<div class="wrap" style="padding:0 16px 80px;">
+
+  <div class="priv-hero">
+    <div class="priv-badge">🛡️ Protection des données — RGPD Art. 9</div>
+    <h1>Politique de <em>confidentialité</em></h1>
+    <p>Nous collectons le strict minimum. Vos témoignages vous appartiennent. Voici exactement ce qui se passe avec vos données.</p>
+    <span class="priv-date" id="privDate">Mise à jour : 2026</span>
+  </div>
+
+  <div class="toc">
+    <div class="toc-title">Sommaire</div>
+    <a href="#s1" class="toc-item"><span class="toc-num">01</span>Qui sommes-nous ?</a>
+    <a href="#s2" class="toc-item"><span class="toc-num">02</span>Quelles données collectons-nous ?</a>
+    <a href="#s3" class="toc-item"><span class="toc-num">03</span>Pourquoi et sur quelle base légale ?</a>
+    <a href="#s4" class="toc-item"><span class="toc-num">04</span>Usage et diffusion</a>
+    <a href="#s5" class="toc-item"><span class="toc-num">05</span>Durée de conservation</a>
+    <a href="#s6" class="toc-item"><span class="toc-num">06</span>Sous-traitants et transferts</a>
+    <a href="#s7" class="toc-item"><span class="toc-num">07</span>Personnes mineures</a>
+    <a href="#s8" class="toc-item"><span class="toc-num">08</span>Vos droits RGPD</a>
+    <a href="#s9" class="toc-item"><span class="toc-num">09</span>Nous contacter</a>
+  </div>
+
+  <!-- Section 1 -->
+  <div class="priv-section" id="s1">
+    <div class="sec-head"><div class="sec-num">1</div><h2>Qui sommes-nous ?</h2></div>
+    <p class="priv-text"><strong>Témoigne de moi</strong> est une application web de collecte de témoignages personnels (audio, vidéo, texte) à des fins d'édification communautaire. Le responsable du traitement est l'organisation religieuse qui administre cette application.</p>
+    <div class="infobox ib-orange">
+      <span class="infobox-icon">⚙️</span>
+      <p>L'identité complète du responsable de traitement (nom, adresse, numéro d'association) est disponible sur demande à l'adresse indiquée en section 9.</p>
+    </div>
+  </div>
+
+  <!-- Section 2 -->
+  <div class="priv-section" id="s2">
+    <div class="sec-head"><div class="sec-num">2</div><h2>Quelles données collectons-nous ?</h2></div>
+    <table class="data-table">
+      <thead><tr><th>Donnée</th><th>Obligatoire</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td>Prénom / Nom</td><td>Non — facultatif</td><td>Identifier votre témoignage dans l'email</td></tr>
+        <tr><td>Enregistrement audio</td><td>Oui (mode vocal)</td><td>Transmis puis conservé selon finalité</td></tr>
+        <tr><td>Enregistrement vidéo</td><td>Oui (mode vidéo)</td><td>Activé uniquement par votre action volontaire</td></tr>
+        <tr><td>Texte rédigé</td><td>Oui (mode écrit)</td><td>Transmis et conservé selon finalité</td></tr>
+        <tr><td>Date et heure</td><td>Automatique</td><td>Horodatage du témoignage</td></tr>
+      </tbody>
+    </table>
+    <div class="infobox ib-green">
+      <span class="infobox-icon">✅</span>
+      <p><strong>Aucun cookie</strong> de tracking, aucune analytics, aucune publicité. Nous ne créons pas de profil utilisateur.</p>
+    </div>
+  </div>
+
+  <!-- Section 3 -->
+  <div class="priv-section" id="s3">
+    <div class="sec-head"><div class="sec-num">3</div><h2>Pourquoi et sur quelle base légale ?</h2></div>
+    <p class="priv-text">Vos témoignages contiennent des <strong>données religieuses</strong>, classées données sensibles par l'Article 9 du RGPD. Deux bases légales s'appliquent simultanément :</p>
+    <div class="infobox ib-blue">
+      <span class="infobox-icon">⚖️</span>
+      <p><strong>Art. 9.2.a</strong> — Votre <strong>consentement explicite</strong>, donné lors du flux de consentement avant tout enregistrement.<br/><br/><strong>Art. 9.2.d</strong> — Traitement par un <strong>organisme à but non lucratif à finalité religieuse</strong>, limité à ses membres et aux personnes en contact régulier.</p>
+    </div>
+  </div>
+
+  <!-- Section 4 -->
+  <div class="priv-section" id="s4">
+    <div class="sec-head"><div class="sec-num">4</div><h2>Usage et diffusion</h2></div>
+    <p class="priv-text">Vos témoignages sont collectés dans un unique but : <strong>l'édification des fidèles</strong> au sein de la communauté religieuse. Ils peuvent être :</p>
+    <ul style="margin:10px 0 10px 18px;font-size:.9rem;color:#3a2e28;line-height:2;">
+      <li>Conservés dans les archives de l'organisation</li>
+      <li>Partagés lors de réunions ou cultes internes</li>
+      <li>Diffusés sur supports internes (newsletters, intranet)</li>
+    </ul>
+    <div class="infobox ib-orange">
+      <span class="infobox-icon">🚫</span>
+      <p>Vos données ne seront <strong>jamais cédées, vendues ou partagées</strong> à des tiers commerciaux, ni utilisées à des fins publicitaires.</p>
+    </div>
+  </div>
+
+  <!-- Section 5 -->
+  <div class="priv-section" id="s5">
+    <div class="sec-head"><div class="sec-num">5</div><h2>Durée de conservation</h2></div>
+    <table class="data-table">
+      <thead><tr><th>Donnée</th><th>Sur le serveur</th><th>Dans les archives</th></tr></thead>
+      <tbody>
+        <tr><td>Fichier audio/vidéo</td><td>0 — transit en RAM uniquement</td><td>Jusqu'au retrait du consentement</td></tr>
+        <tr><td>Texte rédigé</td><td>0 — transmis immédiatement</td><td>Jusqu'au retrait du consentement</td></tr>
+        <tr><td>Prénom / Nom</td><td>0 — transit en RAM uniquement</td><td>Jusqu'au retrait du consentement</td></tr>
+      </tbody>
+    </table>
+    <div class="infobox ib-blue">
+      <span class="infobox-icon">ℹ️</span>
+      <p>Pour demander la suppression de votre témoignage des archives, contactez-nous à l'adresse de la section 9. Réponse garantie sous 30 jours.</p>
+    </div>
+  </div>
+
+  <!-- Section 6 -->
+  <div class="priv-section" id="s6">
+    <div class="sec-head"><div class="sec-num">6</div><h2>Sous-traitants et transferts</h2></div>
+    <p class="priv-text">Vos données transitent via les sous-traitants suivants :</p>
+    <table class="data-table">
+      <thead><tr><th>Prestataire</th><th>Rôle</th><th>Localisation</th><th>Garanties</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Render.com</strong></td><td>Hébergement</td><td>États-Unis</td><td>Data Privacy Framework UE-USA</td></tr>
+        <tr><td><strong>Resend</strong></td><td>Envoi emails</td><td>États-Unis</td><td>Clauses contractuelles types</td></tr>
+        <tr><td><strong>Google Drive</strong> (optionnel)</td><td>Stockage fichiers</td><td>UE / USA</td><td>Data Privacy Framework UE-USA</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Section 7 -->
+  <div class="priv-section" id="s7">
+    <div class="sec-head"><div class="sec-num">7</div><h2>Personnes mineures</h2></div>
+    <div class="infobox ib-orange">
+      <span class="infobox-icon">⚠️</span>
+      <p>Conformément à l'Article 8 du RGPD et à la loi Informatique et Libertés, l'âge de référence pour le consentement numérique est <strong>15 ans</strong> en France. En dessous de cet âge, le consentement explicite d'un <strong>représentant légal</strong> est obligatoire. Sans ce consentement, tout témoignage est <strong>supprimé systématiquement</strong> sans conservation ni traitement. Toute publication impliquant un mineur nécessite une autorisation écrite préalable.</p>
+    </div>
+  </div>
+
+  <!-- Section 8 -->
+  <div class="priv-section" id="s8">
+    <div class="sec-head"><div class="sec-num">8</div><h2>Vos droits RGPD</h2></div>
+    <p class="priv-text" style="margin-bottom:12px;">Conformément aux Articles 15 à 22 du RGPD, vous disposez des droits suivants :</p>
+    <div class="rights-grid">
+      <div class="right-item"><span class="right-icon">👁️</span><div class="right-title">Accès</div><div class="right-desc">Savoir quelles données nous détenons sur vous</div></div>
+      <div class="right-item"><span class="right-icon">✏️</span><div class="right-title">Rectification</div><div class="right-desc">Corriger des données inexactes</div></div>
+      <div class="right-item"><span class="right-icon">🗑️</span><div class="right-title">Effacement</div><div class="right-desc">Demander la suppression de votre témoignage</div></div>
+      <div class="right-item"><span class="right-icon">✋</span><div class="right-title">Opposition</div><div class="right-desc">Vous opposer à l'utilisation de vos données</div></div>
+      <div class="right-item"><span class="right-icon">📦</span><div class="right-title">Portabilité</div><div class="right-desc">Recevoir vos données dans un format lisible</div></div>
+      <div class="right-item"><span class="right-icon">↩️</span><div class="right-title">Retrait consentement</div><div class="right-desc">Retirer votre consentement à tout moment</div></div>
+    </div>
+    <div class="infobox ib-orange">
+      <span class="infobox-icon">⚠️</span>
+      <p>Si vous estimez que vos droits ne sont pas respectés, vous pouvez introduire une réclamation auprès de la <strong>CNIL</strong> : <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener" style="color:var(--warm1);">cnil.fr/fr/plaintes</a></p>
+    </div>
+  </div>
+
+  <!-- Section 9 -->
+  <div class="priv-section" id="s9">
+    <div class="sec-head"><div class="sec-num">9</div><h2>Nous contacter</h2></div>
+    <p class="priv-text">Pour exercer vos droits ou pour toute question relative à la protection de vos données :</p>
+    <div class="contact-card">
+      <h3>Délégué à la protection des données</h3>
+      <p>Réponse garantie sous <strong>30 jours</strong> conformément au RGPD</p>
+      <a id="contactLink" href="#" class="contact-email">✉️ Nous contacter</a>
+    </div>
+  </div>
+
+  <!-- Section retrait consentement -->
+  <div class="priv-section" id="s-retrait" style="scroll-margin-top:60px;">
+    <div class="sec-head">
+      <div class="sec-num" style="background:linear-gradient(135deg,#d44,#b33);">↩</div>
+      <h2>Retirer votre consentement</h2>
+    </div>
+    <p class="priv-text">Conformément à l'Article 7.3 du RGPD, vous pouvez retirer votre consentement à tout moment. Ce retrait ne remet pas en cause la légalité des traitements effectués avant celui-ci.</p>
+    <div class="infobox ib-orange">
+      <span class="infobox-icon">⚠️</span>
+      <p>Le retrait du consentement supprime uniquement le cookie de session sur cet appareil. Il ne supprime pas les témoignages déjà transmis — pour cela, contactez-nous via la section 9.</p>
+    </div>
+    <div class="contact-card" style="margin-top:14px;">
+      <h3>↩️ Retirer mon consentement</h3>
+      <p>Cette action efface votre accord sur cet appareil. Vous devrez redonner votre consentement lors de votre prochaine visite.</p>
+      <button id="btnRevoke" onclick="revokeConsent()" style="display:inline-block;padding:10px 22px;background:linear-gradient(135deg,#d44,#b33);color:#fff;border:none;border-radius:9px;font-family:inherit;font-size:.86rem;font-weight:600;cursor:pointer;transition:opacity .2s;">
+        ↩️ Retirer mon consentement sur cet appareil
+      </button>
+      <p id="revokeMsg" style="margin-top:10px;font-size:.78rem;color:var(--muted);display:none;"></p>
+    </div>
+  </div>
+
+  <div class="priv-footer">
+    <p>Cette politique est conforme au Règlement Général sur la Protection des Données (RGPD — UE 2016/679) et à la loi Informatique et Libertés modifiée.</p>
+    <p style="margin-top:8px;"><a href="/">← Retour à l'accueil</a></p>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+document.addEventListener('DOMContentLoaded', async () => {
+  const cfg = await tdmLoadConfig();
+  // Date de mise à jour
+  document.getElementById('privDate').textContent =
+    'Mise à jour : ' + new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  // Email de contact
+  if (cfg.contactEmail) {
+    const a = document.getElementById('contactLink');
+    a.href = `mailto:${cfg.contactEmail}`;
+    a.textContent = `✉️ ${cfg.contactEmail}`;
+  }
+});
+
+// ── Retrait consentement ──────────────────────────────────────────
+function revokeConsent() {
+  var btn = document.getElementById('btnRevoke');
+  var msg = document.getElementById('revokeMsg');
+  btn.disabled = true;
+  btn.textContent = '↻ Traitement…';
+  fetch('/api/consent/revoke', { method: 'POST' })
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      if (json.ok) {
+        btn.style.display = 'none';
+        msg.style.display = 'block';
+        msg.style.color   = 'var(--green)';
+        msg.textContent   = '✅ Consentement retiré. Redirection dans 3 secondes…';
+        setTimeout(function() { window.location.href = '/'; }, 3000);
+      } else { throw new Error(json.error || 'Erreur serveur'); }
+    })
+    .catch(function(e) {
+      btn.disabled = false;
+      btn.textContent = '↩️ Retirer mon consentement sur cet appareil';
+      msg.style.display = 'block';
+      msg.style.color   = '#d44';
+      msg.textContent   = '✕ Erreur : ' + e.message;
+    });
+}
+</script>
+</body>
+</html>
