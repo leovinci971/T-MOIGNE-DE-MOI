@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Témoignage écrit — Témoigne de moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin/>
+  <link rel="stylesheet" href="/theme.css"/>
+  <script src="/app.js"></script>
+  <script>
+    // Charger TinyMCE avec la clé depuis config
+    (async function() {
+      try {
+        const cfg = await fetch('/api/config').then(r => r.json());
+        const key = cfg.tinymceKey || 'tinymce-placeholder';
+        const script = document.createElement('script');
+        script.src = `https://cdn.tiny.cloud/1/${key}/tinymce/7/tinymce.min.js`;
+        document.head.appendChild(script);
+      } catch(e) {
+        console.error('Chargement TinyMCE config:', e.message);
+      }
+    })();
+  </script>
+  <style>
+    /* ── Bande récap compacte ────────────────────────────────── */
+    .recap-band {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: .72rem;
+      color: var(--muted);
+    }
+    .recap-band.show { display: flex; }
+    .recap-sep { color: var(--border); }
+    .recap-modify {
+      margin-left: auto; font-size: .7rem; color: var(--muted);
+      text-decoration: underline; cursor: pointer;
+      background: none; border: none; font-family: inherit; padding: 0; flex-shrink: 0;
+    }
+    .recap-modify:hover { color: var(--warm1); }
+
+    /* ── Bloc champs rétractable ─────────────────────────────── */
+    .fields-block {
+      overflow: hidden;
+      max-height: 500px;
+      opacity: 1;
+      transition: max-height .4s ease, opacity .3s ease;
+    }
+    .fields-block.collapsed { max-height: 0; opacity: 0; }
+
+    /* ── Onglets ─────────────────────────────────────────────── */
+    .mode-tabs {
+      display: flex;
+      border-bottom: 1.5px solid var(--border);
+      background: var(--card);
+      border-radius: var(--r) var(--r) 0 0;
+      overflow: hidden;
+    }
+    .mode-tab {
+      flex: 1; padding: 11px 8px; text-align: center;
+      font-size: .72rem; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--muted); cursor: pointer;
+      border-bottom: 2px solid transparent; transition: all .18s;
+    }
+    .mode-tab.active { color: var(--green); border-bottom-color: var(--green); background: rgba(107,174,142,.04); }
+    .mode-tab:hover { color: var(--text); }
+
+    /* ── Éditeur pleine largeur ──────────────────────────────── */
+    /* On sort l'éditeur du .wrap pour aller bord à bord */
+    .editor-fullwidth {
+      width: 100vw;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .tox-wrap {
+      border-radius: 0 0 0 0;
+      overflow: hidden;
+      border: none;
+      border-top: none;
+    }
+    /* TinyMCE hauteur agrandie */
+    .tox-wrap .tox.tox-tinymce { border: none !important; height: 380px !important; }
+    /* Décalage 5mm (~19px) du texte à l'intérieur de TinyMCE */
+    /* Appliqué via content_style */
+
+    /* ── Panel dictée ────────────────────────────────────────── */
+    .voice-panel {
+      display: none;
+      border-top: none;
+      background: var(--card);
+      padding: 18px;
+    }
+    .voice-panel.active { display: block; }
+
+    /* Hint option B */
+    .hint-b {
+      display: flex; align-items: center; gap: 6px;
+      flex-wrap: wrap; margin-bottom: 16px;
+      font-size: .78rem; color: var(--muted); line-height: 1.5;
+    }
+    .hint-tab {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 6px;
+      background: rgba(107,174,142,.1);
+      border: 0.5px solid rgba(107,174,142,.25);
+      font-size: .74rem; color: #3B6D11; font-weight: 600;
+    }
+
+    .btn-voice {
+      width: 64px; height: 64px; border-radius: 50%; border: none; cursor: pointer;
+      background: linear-gradient(145deg, var(--warm1), #c4613a);
+      display: flex; align-items: center; justify-content: center; font-size: 26px;
+      box-shadow: 0 0 0 5px rgba(232,130,90,.12), 0 6px 20px rgba(232,130,90,.38);
+      transition: all .22s cubic-bezier(.34,1.56,.64,1); margin: 0 auto;
+    }
+    .btn-voice:active { transform: scale(.92); }
+    .btn-voice.listening {
+      background: var(--bg); border: 2px solid var(--warm1);
+      animation: vPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes vPulse {
+      0%,100% { box-shadow: 0 0 0 5px rgba(232,130,90,.08), 0 0 30px rgba(232,130,90,.2); }
+      50%      { box-shadow: 0 0 0 12px rgba(232,130,90,.03), 0 0 50px rgba(232,130,90,.25); }
+    }
+    .voice-status {
+      font-size: .68rem; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--muted); text-align: center; margin-top: 10px;
+    }
+    .voice-status.on { color: var(--warm1); }
+    .lang-sel {
+      background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: inherit; font-size: .82rem;
+      padding: 7px 10px; outline: none; cursor: pointer;
+    }
+    .transcript-live {
+      margin-top: 12px; padding: 12px 14px; background: var(--bg);
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: .84rem; color: var(--muted); min-height: 48px;
+      font-style: italic; line-height: 1.6; transition: color .2s;
+    }
+    .transcript-live.has { color: var(--text); font-style: normal; }
+    .voice-controls { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+
+    /* ── Bouton feedback intégré sous Envoyer ────────────────── */
+    .feedback-inline {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      padding: 10px 20px; border-radius: 30px;
+      background: linear-gradient(135deg, var(--warm1), var(--warm2));
+      color: #fff; font-family: inherit; font-size: .82rem; font-weight: 600;
+      border: none; cursor: pointer; text-decoration: none;
+      box-shadow: 0 4px 16px rgba(232,130,90,.35);
+      transition: all .2s; align-self: center;
+      width: fit-content; margin: 0 auto;
+    }
+    .feedback-inline:hover { opacity: .9; transform: translateY(-1px); }
+    .fi-pulse { animation: fiPulse 2.5s ease-in-out infinite; display: inline-block; }
+    @keyframes fiPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+
+    /* ── Zone basse ─────────────────────────────────────────── */
+    .bottom-zone {
+      display: flex; flex-direction: column; gap: 10px;
+      padding: 14px 16px 24px;
+    }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/" class="topbar-logo">
+    <div class="topbar-icon" id="topbarIcon">
+      <svg viewBox="0 0 24 24" fill="white" width="16" height="16"><rect x="10" y="2" width="4" height="20" rx="1"/><rect x="2" y="8" width="20" height="4" rx="1"/></svg>
+    </div>
+    <span id="topbarTitle">Témoigne de moi</span>
+  </a>
+</div>
+
+<div class="wrap">
+  <a href="/" class="back">← Choisir un autre mode</a>
+
+  <div class="page-header">
+    <div class="page-icon" style="background:rgba(107,174,142,.12);">✍️</div>
+    <h1>Témoignage écrit</h1>
+    <p>Rédigez ou dictez librement votre message</p>
+  </div>
+
+  <!-- ── Bande récap ────────────────────────────────────────── -->
+  <div class="recap-band" id="recapBand">
+    <span id="recapTitre">🏷 Sans titre</span>
+    <span class="recap-sep">·</span>
+    <span id="recapIdent">👤 Anonyme</span>
+    <button class="recap-modify" onclick="expand()">Modifier</button>
+  </div>
+
+  <!-- ── Champs identité + titre ───────────────────────────── -->
+  <div class="fields-block" id="fieldsBlock">
+    <div class="card" style="border-radius:var(--r) var(--r) 0 0;border-bottom:none;margin-bottom:0;">
+      <div class="field" style="margin-bottom:0;">
+        <input type="text" id="subjectInput"
+               placeholder="Titre du témoignage (facultatif)" maxlength="80"/>
+      </div>
+    </div>
+    <div class="card" style="border-radius:0 0 var(--r) var(--r);">
+      <div class="field">
+        <input type="text" id="prenomInput"
+               placeholder="Prénom (facultatif)" maxlength="40" autocomplete="given-name"/>
+      </div>
+      <div class="field">
+        <input type="text" id="nomInput"
+               placeholder="Nom (facultatif)" maxlength="40" autocomplete="family-name"/>
+      </div>
+      <div class="field-anon" style="margin-bottom:0;">
+        <span class="anon-icon">👤</span> Laisser vide = témoignage anonyme
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Éditeur pleine largeur (hors .wrap) ───────────────────── -->
+<div class="editor-fullwidth">
+  <div class="mode-tabs">
+    <div class="mode-tab active" id="tabWrite" onclick="switchTab('write')">✏️ Rédaction</div>
+    <div class="mode-tab"        id="tabVoice" onclick="switchTab('voice')">🎙 Dictée vocale</div>
+  </div>
+
+  <!-- TinyMCE -->
+  <div class="tox-wrap" id="writePanel">
+    <textarea id="editor"></textarea>
+  </div>
+
+  <!-- Dictée vocale -->
+  <div class="voice-panel" id="voicePanel">
+    <div class="voice-controls">
+      <select class="lang-sel" id="langSel">
+        <option value="fr-FR">🇫🇷 Français</option>
+        <option value="en-US">🇺🇸 English</option>
+        <option value="es-ES">🇪🇸 Español</option>
+        <option value="de-DE">🇩🇪 Deutsch</option>
+        <option value="it-IT">🇮🇹 Italiano</option>
+        <option value="pt-PT">🇵🇹 Português</option>
+        <option value="ar-SA">🇸🇦 العربية</option>
+      </select>
+    </div>
+
+    <!-- Option B — hint avec badge onglet -->
+    <div class="hint-b">
+      <span>Le texte dicté ira dans</span>
+      <span class="hint-tab">✏️ Rédaction</span>
+      <span>automatiquement</span>
+    </div>
+
+    <button class="btn-voice" id="btnVoice" onclick="toggleVoice()">🎙</button>
+    <div class="voice-status" id="voiceStatus">Appuyer pour dicter</div>
+    <div class="transcript-live" id="transcriptLive">En attente de la parole…</div>
+  </div>
+</div>
+
+<!-- ── Zone basse (hors .wrap, même largeur que éditeur) ─────── -->
+<div class="bottom-zone">
+  <button class="btn btn-primary" id="btnSend" onclick="send()">✉️ Envoyer mon témoignage</button>
+  <a href="/feedback?type=ecrit" class="feedback-inline"
+     onclick="sessionStorage.setItem('tdm_type','ecrit')">
+    <span class="fi-pulse">⭐</span> Je donne mon avis
+  </a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+// ── Chargement config puis TinyMCE ────────────────────────────────
+// On attend que le DOM soit prêt (#editor doit exister) avant d'initialiser
+// TinyMCE. tdmLoadConfig (app.js) applique titre+logo, injecte le footer
+// RGPD et retourne la config — on enchaîne ensuite sur TinyMCE.
+function bootEcrit() {
+  tdmLoadConfig()
+    .then(function(cfg) {
+      loadTiny((cfg && cfg.tinymceKey) ? cfg.tinymceKey : 'no-api-key');
+    })
+    .catch(function() { loadTiny('no-api-key'); });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootEcrit);
+} else {
+  bootEcrit();
+}
+
+function loadTiny(key) {
+  var s = document.createElement('script');
+  s.src = 'https://cdn.tiny.cloud/1/' + key + '/tinymce/8/tinymce.min.js';
+  s.referrerPolicy = 'origin';
+  s.onload  = initEditor;
+  s.onerror = function() { if (key !== 'no-api-key') loadTiny('no-api-key'); };
+  document.head.appendChild(s);
+}
+
+function getTinymceSkin() {
+  var saved = localStorage.getItem('tdm_theme');
+  var dark = saved === 'dark' ||
+    (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  return dark ? 'oxide-dark' : 'oxide';
+}
+
+function getTinymceContentCss() {
+  var saved = localStorage.getItem('tdm_theme');
+  var dark = saved === 'dark' ||
+    (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  return dark
+    ? 'body{font-family:"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.78;color:#F0E8E0;background:#1A1410;padding:16px 20px 16px 24px;margin:0;}p{margin:0 0 10px;}'
+    : 'body{font-family:"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.78;color:#2A1F1A;background:#FDF6F0;padding:16px 20px 16px 24px;margin:0;}p{margin:0 0 10px;}';
+}
+
+function initEditor() {
+  // Garde-fous : TinyMCE chargé ET textarea présent dans le DOM
+  if (typeof tinymce === 'undefined') {
+    console.warn('TinyMCE pas encore chargé, nouvelle tentative…');
+    return setTimeout(initEditor, 200);
+  }
+  if (!document.getElementById('editor')) {
+    console.warn('#editor introuvable, nouvelle tentative…');
+    return setTimeout(initEditor, 200);
+  }
+  tinymce.init({
+    selector:      '#editor',
+    menubar:       false,
+    statusbar:     false,
+    resize:        false,
+    plugins:       ['autolink','lists','link','searchreplace','wordcount','emoticons'],
+    toolbar:       'undo redo | styles | bold italic underline | forecolor | alignleft aligncenter alignright | bullist numlist | link | emoticons | removeformat',
+    skin:          getTinymceSkin(),
+    content_style: getTinymceContentCss(),
+    placeholder:   'Partagez votre expérience…',
+    setup: function(ed) {
+      ed.on('focus', function() { collapse(); });
+    },
+  });
+}
+
+// Réinitialiser TinyMCE quand le thème change
+var _origToggleTheme = window.toggleTheme;
+window.toggleTheme = function() {
+  if (_origToggleTheme) _origToggleTheme();
+  // Réinitialiser TinyMCE avec le nouveau skin
+  setTimeout(function() {
+    var ed = tinymce.get('editor');
+    if (ed) {
+      var content = ed.getContent();
+      ed.destroy();
+      initEditor();
+      // Restaurer le contenu après réinit
+      setTimeout(function() {
+        var newEd = tinymce.get('editor');
+        if (newEd && content) newEd.setContent(content);
+      }, 300);
+    }
+  }, 50);
+};
+
+// ── Collapse / Expand ─────────────────────────────────────────────
+var isCollapsed = false;
+
+function collapse() {
+  if (isCollapsed) return;
+  isCollapsed = true;
+
+  var titre  = document.getElementById('subjectInput').value.trim();
+  var prenom = document.getElementById('prenomInput').value.trim();
+  var nom    = document.getElementById('nomInput').value.trim();
+  var parts  = [prenom, nom].filter(function(v) { return v; });
+  var ident  = parts.length ? parts.join(' ') : 'Anonyme';
+
+  document.getElementById('recapTitre').textContent = '🏷 ' + (titre || 'Sans titre');
+  document.getElementById('recapIdent').textContent = '👤 ' + ident;
+  document.getElementById('fieldsBlock').classList.add('collapsed');
+  document.getElementById('recapBand').classList.add('show');
+}
+
+function expand() {
+  if (!isCollapsed) return;
+  isCollapsed = false;
+  document.getElementById('fieldsBlock').classList.remove('collapsed');
+  document.getElementById('recapBand').classList.remove('show');
+  setTimeout(function() { document.getElementById('subjectInput').focus(); }, 50);
+}
+
+// ── Onglets ───────────────────────────────────────────────────────
+var currentTab = 'write';
+
+function switchTab(tab) {
+  collapse();
+  currentTab = tab;
+  var isWrite = tab === 'write';
+  document.getElementById('tabWrite').classList.toggle('active', isWrite);
+  document.getElementById('tabVoice').classList.toggle('active', !isWrite);
+  document.getElementById('writePanel').style.display = isWrite ? 'block' : 'none';
+  document.getElementById('voicePanel').classList.toggle('active', !isWrite);
+  if (isWrite) {
+    setTimeout(function() { var ed = tinymce.get('editor'); if (ed) ed.focus(); }, 80);
+  }
+}
+
+// ── Dictée ────────────────────────────────────────────────────────
+var recog = null, listening = false;
+
+function initSpeech() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('Dictée non supportée. Utilisez Chrome.', 'err'); return false; }
+  recog = new SR();
+  recog.continuous = true; recog.interimResults = true;
+  recog.lang = document.getElementById('langSel').value;
+  recog.onstart  = function() { listening = true; setVoiceUI(true); };
+  recog.onend    = function() { if (listening) { try { recog.start(); } catch(e) { stopVoice(); } } };
+  recog.onerror  = function(e) {
+    if (e.error === 'no-speech') return;
+    if (e.error === 'not-allowed') { toast('Microphone refusé.', 'err'); stopVoice(); }
+  };
+  recog.onresult = function(e) {
+    var interim = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      var t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) {
+        var ed = tinymce.get('editor');
+        if (ed) ed.execCommand('mceInsertContent', false, t + ' ');
+      } else { interim += t; }
+    }
+    var live = document.getElementById('transcriptLive');
+    live.textContent = interim || 'En attente de la parole…';
+    live.classList.toggle('has', !!interim);
+  };
+  return true;
+}
+
+function toggleVoice() { listening ? stopVoice() : startVoice(); }
+
+function startVoice() {
+  if (!recog && !initSpeech()) return;
+  recog.lang = document.getElementById('langSel').value;
+  try { recog.start(); toast('Dictée démarrée', 'inf'); } catch(e) {}
+}
+
+function stopVoice() {
+  listening = false;
+  try { recog && recog.stop(); } catch(e) {}
+  setVoiceUI(false);
+  document.getElementById('transcriptLive').textContent = 'En attente de la parole…';
+  document.getElementById('transcriptLive').classList.remove('has');
+  toast('Dictée terminée ✓', 'ok');
+  // Option C — bascule automatique vers Rédaction
+  switchTab('write');
+}
+
+function setVoiceUI(on) {
+  document.getElementById('btnVoice').textContent = on ? '⏹' : '🎙';
+  document.getElementById('btnVoice').classList.toggle('listening', on);
+  document.getElementById('voiceStatus').textContent = on ? 'Enregistrement en cours…' : 'Appuyer pour dicter';
+  document.getElementById('voiceStatus').classList.toggle('on', on);
+}
+
+// ── Envoi ─────────────────────────────────────────────────────────
+function send() {
+  if (listening) stopVoice();
+  var ed = tinymce.get('editor');
+  if (!ed) { toast('Éditeur non chargé. Attendez quelques secondes.', 'err'); return; }
+  var html = ed.getContent();
+  var text = ed.getContent({ format: 'text' });
+  if (!text.trim()) { toast('Veuillez rédiger votre témoignage.', 'err'); return; }
+
+  var prenom  = document.getElementById('prenomInput').value.trim();
+  var nom     = document.getElementById('nomInput').value.trim();
+  var parts   = [prenom, nom].filter(function(v) { return v; });
+  var sender  = parts.length ? parts.join(' ') : 'Anonyme';
+  var subject = document.getElementById('subjectInput').value.trim();
+
+  var btn = document.getElementById('btnSend');
+  btn.disabled = true; btn.innerHTML = '<span class="spin">↻</span> Envoi…';
+
+  fetch('/api/send/ecrit', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sender: sender, subject: subject, htmlContent: html, textContent: text }),
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(json) {
+    if (!json.ok) throw new Error(json.error);
+    toast('Témoignage envoyé ✓', 'ok');
+    // Vider l'éditeur après envoi
+    ed.setContent('');
+    document.getElementById('subjectInput').value = '';
+    document.getElementById('prenomInput').value = '';
+    document.getElementById('nomInput').value = '';
+    expand();
+    btn.disabled = false;
+    btn.innerHTML = '✉️ Envoyer mon témoignage';
+  })
+  .catch(function(e) {
+    btn.disabled = false; btn.innerHTML = '✉️ Envoyer mon témoignage';
+    toast('Erreur : ' + e.message, 'err');
+  });
+}
+
+var tT;
+function toast(msg, type) {
+  type = type || 'inf';
+  var el = document.getElementById('toast');
+  el.className = 'toast ' + type + ' show';
+  el.textContent = msg;
+  clearTimeout(tT); tT = setTimeout(function() { el.classList.remove('show'); }, 3500);
+}
+</script>
+
+<!-- ── Initialisation au chargement ──────────────────────────────────── -->
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+  // Charger config et injecter footer RGPD
+  await tdmLoadConfig();
+  
+  // Initialiser TinyMCE avec délai pour laisser le script CDN charger
+  setTimeout(initEditor, 200);
+});
+</script>
+</body>
+</html>
